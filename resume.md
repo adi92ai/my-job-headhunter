@@ -8,7 +8,7 @@
 
 # ADIT AGARWAL
 **Business Analytics & AI | Digital Go-to-Market (DGTM) Analytics | Revenue Operations | Strategy & Planning**
-Hyderabad, India | +91 81431 21722 | adit.787@gmail.com | linkedin.com/in/adit92
+Hyderabad, India | linkedin.com/in/adit92
 
 ## EXECUTIVE SUMMARY
 Business Analytics leader specializing in Digital Go-to-Market (DGTM) Analytics with 12+ years of experience partnering with executive leadership to improve forecasting, revenue operations, business performance, and strategic decision-making across global SaaS organizations[cite: 1]. Currently leads Business Analytics supporting ServiceNow's $10B+ Digital Go-to-Market organization, partnering with Senior Directors, AVPs, and Commercial GVPs[cite: 1]. Previously progressed through five increasingly senior roles at Amazon, delivering $1.2B+ in quantified business impact through enterprise analytics, automation, and operational transformation, complemented by entrepreneurial P&L ownership[cite: 1].

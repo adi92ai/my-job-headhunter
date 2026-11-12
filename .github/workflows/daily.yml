@@ -2,7 +2,8 @@ name: Daily AI Job Headhunter
 
 on:
   schedule:
-    - cron: '30 2 * * *' # Runs automatically at 8:00 AM IST every day
+    - cron: '0 3 * * *'   # Runs at 8:30 AM IST every day
+    - cron: '0 13 * * *'  # Runs at 6:30 PM IST every day
   workflow_dispatch:       # Lets you click a button to run manually anytime
 
 permissions:
@@ -21,6 +22,8 @@ jobs:
         run: python discover_companies.py
       - name: Run Executive Research Headhunter
         env:
+          NVIDIA_API_KEY: ${{ secrets.NVIDIA_API_KEY }}
+          GROQ_API_KEY: ${{ secrets.GROQ_API_KEY }}
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
           GMAIL_USER: ${{ secrets.GMAIL_USER }}
           GMAIL_APP_PASSWORD: ${{ secrets.GMAIL_APP_PASSWORD }}

@@ -64,7 +64,7 @@ def fetch_jobs(company, ats, slug):
                 jobs.append({
                     "id": f"gh_{j['id']}", "company": company, "title": j["title"],
                     "location": j.get("location", {}).get("name", ""),
-                    "url": j["absolute_url"], "desc": j.get("content", "")[:5500]
+                    "url": j["absolute_url"], "desc": j.get("content", "")[:5000]
                 })
         elif ats == "lever":
             r = requests.get(f"https://api.lever.co/v0/postings/{slug}", timeout=12).json()
@@ -73,7 +73,7 @@ def fetch_jobs(company, ats, slug):
                     jobs.append({
                         "id": f"lv_{j['id']}", "company": company, "title": j["text"],
                         "location": j.get("categories", {}).get("location", ""),
-                        "url": j["hostedUrl"], "desc": j.get("descriptionPlain", "")[:5500]
+                        "url": j["hostedUrl"], "desc": j.get("descriptionPlain", "")[:5000]
                     })
         elif ats == "ashby":
             r = requests.get(f"https://api.ashbyhq.com/posting-api/job-board/{slug}", timeout=12).json()
@@ -81,7 +81,7 @@ def fetch_jobs(company, ats, slug):
                 jobs.append({
                     "id": f"ab_{j['id']}", "company": company, "title": j["title"],
                     "location": j.get("location", ""),
-                    "url": j["jobUrl"], "desc": j.get("descriptionPlain", "")[:5500]
+                    "url": j["jobUrl"], "desc": j.get("descriptionPlain", "")[:5000]
                 })
         elif ats == "smartrecruiters":
             r = requests.get(f"https://api.smartrecruiters.com/v1/companies/{slug}/postings?limit=100", timeout=12).json()
@@ -92,7 +92,7 @@ def fetch_jobs(company, ats, slug):
                     "id": f"sr_{j['id']}", "company": company, "title": j["name"],
                     "location": loc_str,
                     "url": f"https://jobs.smartrecruiters.com/{slug}/{j['id']}",
-                    "desc": j.get("jobAd", {}).get("sections", {}).get("jobDescription", {}).get("text", j["name"])[:5500]
+                    "desc": j.get("jobAd", {}).get("sections", {}).get("jobDescription", {}).get("text", j["name"])[:5000]
                 })
         elif ats == "workable":
             r = requests.get(f"https://apply.workable.com/api/v1/widget/accounts/{slug}", timeout=12).json()
@@ -100,7 +100,7 @@ def fetch_jobs(company, ats, slug):
                 jobs.append({
                     "id": f"wk_{j['shortcode']}", "company": company, "title": j["title"],
                     "location": f"{j.get('city', '')}, {j.get('country', '')}",
-                    "url": j["url"], "desc": j.get("description", j["title"])[:5500]
+                    "url": j["url"], "desc": j.get("description", j["title"])[:5000]
                 })
         elif ats == "workday":
             parts = slug.split("|")
@@ -128,10 +128,10 @@ def call_gemini(model, prompt, timeout=45):
         res = requests.post(url, json=payload, timeout=timeout).json()
         if "candidates" in res:
             return json.loads(res["candidates"][0]["content"]["parts"][0]["text"])
-        time.sleep(3)
+        time.sleep(5)
     raise RuntimeError(f"API Response: {res}")
 
-# STAGE A: Fast Triage with Gemini 3.8 Flash
+# STAGE A ($0 Free Tier): Fast Triage with Gemini 2.5 Flash-Lite (500 RPD / 15 RPM)
 def triage_job(job):
     prompt = f"""You are an executive recruiter screening roles for Adit Agarwal (12+ yrs exp: leads Business Analytics for ServiceNow's $10B+ DGTM org, $1.2B+ quantified impact at Amazon, P&L founder).
 Score this job 0-100 against Adit's resume and preferences. Reserve 80+ ONLY for true Manager, Senior Manager, Director, or Head roles in India/Remote matching Analytics, RevOps, GTM, or Commercial Strategy.
@@ -143,9 +143,9 @@ RESUME:
 JOB: {job['title']} at {job['company']} ({job['location']})
 DESCRIPTION:
 {job['desc']}"""
-    return call_gemini("gemini-3.8-flash", prompt, timeout=30)
+    return call_gemini("gemini-3.5-flash-lite", prompt, timeout=35)
 
-# STAGE B: Deep Executive Research + Touch-Up Resume Generation with Gemini 3.1 Pro
+# STAGE B ($0 Free Tier): Deep Research + Touch-Up Resume (2.5-Flash with automatic 2.5-Flash-Lite fallback)
 def deep_research_and_touchup(job):
     prompt = f"""You are an elite executive career strategist preparing Adit Agarwal for a high-priority application.
 Perform deep role research AND a surgical "Touch-Up Mode" tailoring of Adit's resume for this exact job.
@@ -174,7 +174,13 @@ MASTER RESUME:
 TARGET JOB: {job['title']} at {job['company']} ({job['location']})
 JOB DESCRIPTION:
 {job['desc']}"""
-    return call_gemini("gemini-3.1-pro", prompt, timeout=60)
+    try:
+        time.sleep(12.5)  # Stays safely under 5 RPM free limit on gemini-3.8-flash
+        return call_gemini("gemini-3.8-flash", prompt, timeout=50)
+    except Exception:
+        print("  -> Falling back to gemini-3.5-flash-lite for Stage B...")
+        time.sleep(4.5)
+        return call_gemini("gemini-3.5-flash-lite", prompt, timeout=50)
 
 def build_docx_resume(job, data):
     os.makedirs("tailored_resumes", exist_ok=True)
@@ -293,17 +299,17 @@ with open("companies.csv", "r", encoding="utf-8") as f:
                 print(f"Triaged [{score}/100]: {job['title']} @ {job['company']}")
 
                 if score >= 80:
-                    print(f"  -> Running Deep Research & Touch-Up Resume for {job['company']}...")
+                    print(f"  -> Generating Executive Research & Touch-Up .docx Resume for {job['company']}...")
                     deep = deep_research_and_touchup(job)
                     docx_path = build_docx_resume(job, deep)
                     attachments.append(docx_path)
                     job["score"] = score
                     job.update(deep)
                     matches.append(job)
-                time.sleep(0.5)
+                time.sleep(4.5)  # Stays safely under 15 RPM free limit on gemini-3.5-flash-lite
             except Exception as e:
                 print(f"AI error on {job['title']}: {e}")
-                time.sleep(2)
+                time.sleep(5)
 
 print(f"Scanned {companies_checked} companies | Triaged {evaluated_count} India/Remote roles | Deep-Researched {len(matches)} matches >= 80.")
 

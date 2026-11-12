@@ -142,4 +142,9 @@ if matches:
     msg["From"] = GMAIL_USER
     msg["To"] = GMAIL_USER
     msg.attach(MIMEText(html, "html"))
-    with smtplib.SMTP_
+    with smtplib.SMTP_SSL("smtp.gmail.com", 465) as server:
+        server.login(GMAIL_USER, GMAIL_APP_PASSWORD)
+        server.send_message(msg)
+    print(f"Sent {len(matches)} matches!")
+else:
+    print("No new matches >= 75 today.")

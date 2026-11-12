@@ -1,4 +1,4 @@
-import os, csv, json, smtplib, requests
+import os, csv, json, time, smtplib, requests
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
 
@@ -23,13 +23,28 @@ INCLUDE_KEYWORDS = [
     "strategy", "planning", "business intelligence", "sales operations", "commercial"
 ]
 EXCLUDE_KEYWORDS = [
-    "intern", "internship", "university grad", "junior",
-    "coordinator", "specialist", "representative", "sdr", "bdr"
+    "intern", "internship", "university grad", "junior", "coordinator",
+    "specialist", "representative", "sdr", "bdr", "account executive",
+    "counsel", "recruiter", "recruiting", "software engineer", "enablement"
 ]
-INDIA_LOCATIONS = [
-    "india", "hyderabad", "bengaluru", "bangalore", "mumbai",
-    "delhi", "gurgaon", "gurugram", "noida", "pune", "chennai", "remote"
+INDIA_CITIES = [
+    "hyderabad", "bengaluru", "bangalore", "mumbai",
+    "delhi", "gurgaon", "gurugram", "noida", "pune", "chennai"
 ]
+EXCLUDE_LOCATIONS = ["indiana", "remote - us", "remote, us", "united states", "amer", "emea", "latam", "uk", "canada"]
+
+def is_india_eligible(loc_raw):
+    loc = loc_raw.lower()
+    if any(bad in loc for bad in EXCLUDE_LOCATIONS):
+        return False
+    if any(city in loc for city in INDIA_CITIES):
+        return True
+    # Match "india" as a standalone word (avoids "indiana")
+    if "india" in loc.replace(",", " ").replace("-", " ").replace("(", " ").replace(")", " ").split():
+        return True
+    if "remote" in loc and ("apac" in loc or "global" in loc or loc.strip() == "remote"):
+        return True
+    return False
 
 def fetch_jobs(company, ats, slug):
     jobs = []
@@ -77,6 +92,8 @@ DESCRIPTION:
     url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key={GEMINI_API_KEY}"
     payload = {"contents": [{"parts": [{"text": prompt}]}], "generationConfig": {"responseMimeType": "application/json"}}
     res = requests.post(url, json=payload, timeout=30).json()
+    if "candidates" not in res:
+        raise RuntimeError(f"API Response: {res}")
     text = res["candidates"][0]["content"]["parts"][0]["text"]
     return json.loads(text)
 
@@ -91,9 +108,7 @@ with open("companies.csv", "r", encoding="utf-8") as f:
             seen_jobs.add(job["id"])
 
             title_lower = job["title"].lower()
-            loc_lower = job["location"].lower()
-
-            if not any(loc in loc_lower for loc in INDIA_LOCATIONS):
+            if not is_india_eligible(job["location"]):
                 continue
             if not any(k in title_lower for k in INCLUDE_KEYWORDS) or any(k in title_lower for k in EXCLUDE_KEYWORDS):
                 continue
@@ -101,11 +116,14 @@ with open("companies.csv", "r", encoding="utf-8") as f:
             try:
                 evaluated_count += 1
                 result = score_job(job)
+                print(f"Scored [{result.get('score')}/100]: {job['title']} @ {job['company']}")
                 if result.get("score", 0) >= 75:
                     job.update(result)
                     matches.append(job)
+                time.sleep(4.5)  # Stays safely under 15 RPM free rate limit
             except Exception as e:
                 print(f"AI error on {job['title']}: {e}")
+                time.sleep(5)
 
 print(f"Evaluated {evaluated_count} relevant India/Remote roles. Found {len(matches)} matches >= 75.")
 
@@ -124,9 +142,4 @@ if matches:
     msg["From"] = GMAIL_USER
     msg["To"] = GMAIL_USER
     msg.attach(MIMEText(html, "html"))
-    with smtplib.SMTP_SSL("smtp.gmail.com", 465) as server:
-        server.login(GMAIL_USER, GMAIL_APP_PASSWORD)
-        server.send_message(msg)
-    print(f"Sent {len(matches)} matches!")
-else:
-    print("No new matches >= 75 today.")
+    with smtplib.SMTP_

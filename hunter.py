@@ -5,7 +5,9 @@ from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
 from email.mime.application import MIMEApplication
 
-GEMINI_API_KEY = os.environ["GEMINI_API_KEY"]
+NVIDIA_API_KEY = os.environ.get("NVIDIA_API_KEY", "")
+GROQ_API_KEY = os.environ["GROQ_API_KEY"]
+GEMINI_API_KEY = os.environ.get("GEMINI_API_KEY", "")
 GMAIL_USER = os.environ["GMAIL_USER"]
 GMAIL_APP_PASSWORD = os.environ["GMAIL_APP_PASSWORD"]
 CONTACT_HEADER = os.environ.get("RESUME_CONTACT_HEADER", "Hyderabad, India | linkedin.com/in/adit92")
@@ -55,6 +57,10 @@ def is_india_eligible(loc_raw):
         return True
     return False
 
+def clean_html(raw_html):
+    text = re.sub(r"<[^>]+>", " ", raw_html or "")
+    return re.sub(r"\s+", " ", text).strip()[:14000]  # Full untruncated JD text
+
 def fetch_jobs(company, ats, slug):
     jobs = []
     try:
@@ -64,7 +70,7 @@ def fetch_jobs(company, ats, slug):
                 jobs.append({
                     "id": f"gh_{j['id']}", "company": company, "title": j["title"],
                     "location": j.get("location", {}).get("name", ""),
-                    "url": j["absolute_url"], "desc": j.get("content", "")[:5000]
+                    "url": j["absolute_url"], "desc": clean_html(j.get("content", ""))
                 })
         elif ats == "lever":
             r = requests.get(f"https://api.lever.co/v0/postings/{slug}", timeout=12).json()
@@ -73,7 +79,7 @@ def fetch_jobs(company, ats, slug):
                     jobs.append({
                         "id": f"lv_{j['id']}", "company": company, "title": j["text"],
                         "location": j.get("categories", {}).get("location", ""),
-                        "url": j["hostedUrl"], "desc": j.get("descriptionPlain", "")[:5000]
+                        "url": j["hostedUrl"], "desc": clean_html(j.get("descriptionPlain", ""))
                     })
         elif ats == "ashby":
             r = requests.get(f"https://api.ashbyhq.com/posting-api/job-board/{slug}", timeout=12).json()
@@ -81,7 +87,7 @@ def fetch_jobs(company, ats, slug):
                 jobs.append({
                     "id": f"ab_{j['id']}", "company": company, "title": j["title"],
                     "location": j.get("location", ""),
-                    "url": j["jobUrl"], "desc": j.get("descriptionPlain", "")[:5000]
+                    "url": j["jobUrl"], "desc": clean_html(j.get("descriptionPlain", ""))
                 })
         elif ats == "smartrecruiters":
             r = requests.get(f"https://api.smartrecruiters.com/v1/companies/{slug}/postings?limit=100", timeout=12).json()
@@ -92,7 +98,7 @@ def fetch_jobs(company, ats, slug):
                     "id": f"sr_{j['id']}", "company": company, "title": j["name"],
                     "location": loc_str,
                     "url": f"https://jobs.smartrecruiters.com/{slug}/{j['id']}",
-                    "desc": j.get("jobAd", {}).get("sections", {}).get("jobDescription", {}).get("text", j["name"])[:5000]
+                    "desc": clean_html(j.get("jobAd", {}).get("sections", {}).get("jobDescription", {}).get("text", j["name"]))
                 })
         elif ats == "workable":
             r = requests.get(f"https://apply.workable.com/api/v1/widget/accounts/{slug}", timeout=12).json()
@@ -100,7 +106,7 @@ def fetch_jobs(company, ats, slug):
                 jobs.append({
                     "id": f"wk_{j['shortcode']}", "company": company, "title": j["title"],
                     "location": f"{j.get('city', '')}, {j.get('country', '')}",
-                    "url": j["url"], "desc": j.get("description", j["title"])[:5000]
+                    "url": j["url"], "desc": clean_html(j.get("description", j["title"]))
                 })
         elif ats == "workday":
             parts = slug.split("|")
@@ -121,31 +127,76 @@ def fetch_jobs(company, ats, slug):
         pass
     return jobs
 
-def call_gemini(model, prompt, timeout=45):
+def extract_json_safely(raw_text):
+    cleaned = re.sub(r"<think>.*?</think>", "", raw_text, flags=re.DOTALL).strip()
+    cleaned = re.sub(r"^```(?:json)?\s*|\s*```$", "", cleaned, flags=re.MULTILINE).strip()
+    start, end = cleaned.find("{"), cleaned.rfind("}")
+    if start != -1 and end != -1:
+        cleaned = cleaned[start:end+1]
+    return json.loads(cleaned)
+
+def call_nvidia(prompt, model="mistralai/mistral-large-4-1t-a52b", timeout=90):
+    url = "https://integrate.api.nvidia.com/v1/chat/completions"
+    headers = {"Authorization": f"Bearer {NVIDIA_API_KEY}", "Content-Type": "application/json"}
+    payload = {
+        "model": model,
+        "messages": [
+            {"role": "system", "content": "You are an elite executive career strategist. Return ONLY valid JSON with no markdown or extra commentary."},
+            {"role": "user", "content": prompt}
+        ],
+        "temperature": 0.3,
+        "max_tokens": 8192
+    }
+    res = requests.post(url, headers=headers, json=payload, timeout=timeout).json()
+    if "choices" in res:
+        content = res["choices"][0]["message"].get("content", "")
+        return extract_json_safely(content)
+    raise RuntimeError(f"NVIDIA NIM Response: {res}")
+
+def call_groq(prompt, model="openai/gpt-oss-120b", timeout=35):
+    url = "https://api.groq.com/openai/v1/chat/completions"
+    headers = {"Authorization": f"Bearer {GROQ_API_KEY}", "Content-Type": "application/json"}
+    payload = {
+        "model": model,
+        "messages": [
+            {"role": "system", "content": "You are an executive recruiter. Always respond with valid JSON only."},
+            {"role": "user", "content": prompt}
+        ],
+        "response_format": {"type": "json_object"},
+        "temperature": 0.2
+    }
+    res = requests.post(url, headers=headers, json=payload, timeout=timeout).json()
+    if "choices" in res:
+        return extract_json_safely(res["choices"][0]["message"]["content"])
+    raise RuntimeError(f"Groq API Response: {res}")
+
+def call_gemini(prompt, model="gemini-3.8-flash", timeout=45):
     url = f"https://generativelanguage.googleapis.com/v1beta/models/{model}:generateContent?key={GEMINI_API_KEY}"
     payload = {"contents": [{"parts": [{"text": prompt}]}], "generationConfig": {"responseMimeType": "application/json"}}
-    for attempt in range(2):
-        res = requests.post(url, json=payload, timeout=timeout).json()
-        if "candidates" in res:
-            return json.loads(res["candidates"][0]["content"]["parts"][0]["text"])
-        time.sleep(5)
-    raise RuntimeError(f"API Response: {res}")
+    res = requests.post(url, json=payload, timeout=timeout).json()
+    if "candidates" in res:
+        return extract_json_safely(res["candidates"][0]["content"]["parts"][0]["text"])
+    raise RuntimeError(f"Gemini API Response: {res}")
 
-# STAGE A ($0 Free Tier): Fast Triage with Gemini 2.5 Flash-Lite (500 RPD / 15 RPM)
+# STAGE A ($0 Groq Free Tier): Fast Triage on Full Untruncated JD
 def triage_job(job):
-    prompt = f"""You are an executive recruiter screening roles for Adit Agarwal (12+ yrs exp: leads Business Analytics for ServiceNow's $10B+ DGTM org, $1.2B+ quantified impact at Amazon, P&L founder).
-Score this job 0-100 against Adit's resume and preferences. Reserve 80+ ONLY for true Manager, Senior Manager, Director, or Head roles in India/Remote matching Analytics, RevOps, GTM, or Commercial Strategy.
+    prompt = f"""Score this job 0-100 against Adit Agarwal's resume and preferences (12+ yrs exp: leads Business Analytics for ServiceNow's $10B+ DGTM org, $1.2B+ quantified impact at Amazon, P&L founder).
+Reserve 80+ ONLY for true Manager, Senior Manager, Director, or Head roles in India/Remote matching Analytics, RevOps, GTM, or Commercial Strategy.
 Return ONLY valid JSON: {{"score": integer, "quick_reason": "1 sentence"}}
 
 RESUME:
 {RESUME}
 
 JOB: {job['title']} at {job['company']} ({job['location']})
-DESCRIPTION:
+FULL DESCRIPTION:
 {job['desc']}"""
-    return call_gemini("gemini-3.5-flash-lite", prompt, timeout=35)
+    try:
+        return call_groq(prompt, model="openai/gpt-oss-120b", timeout=30)
+    except Exception:
+        time.sleep(3)
+        return call_groq(prompt, model="llama-3.3-70b-versatile", timeout=30)
 
-# STAGE B ($0 Free Tier): Deep Research + Touch-Up Resume (2.5-Flash with automatic 2.5-Flash-Lite fallback)
+# STAGE B ($0 NVIDIA NIM Mistral-Large-4-1T-A52B -> Nemotron-3-Ultra-550B -> DeepSeek-V4.1-Flash -> Gemini 3.8 Flash -> Groq 120B)
 def deep_research_and_touchup(job):
     prompt = f"""You are an elite executive career strategist preparing Adit Agarwal for a high-priority application.
 Perform deep role research AND a surgical "Touch-Up Mode" tailoring of Adit's resume for this exact job.
@@ -172,15 +223,34 @@ MASTER RESUME:
 {RESUME}
 
 TARGET JOB: {job['title']} at {job['company']} ({job['location']})
-JOB DESCRIPTION:
+FULL JOB DESCRIPTION:
 {job['desc']}"""
-    try:
-        time.sleep(12.5)  # Stays safely under 5 RPM free limit on gemini-3.8-flash
-        return call_gemini("gemini-3.8-flash", prompt, timeout=50)
-    except Exception:
-        print("  -> Falling back to gemini-3.5-flash-lite for Stage B...")
-        time.sleep(4.5)
-        return call_gemini("gemini-3.5-flash-lite", prompt, timeout=50)
+
+    if NVIDIA_API_KEY:
+        nim_models = [
+            "mistralai/mistral-large-4-1t-a52b",
+            "nvidia/nemotron-3-ultra-550b-a55b",
+            "deepseek-ai/deepseek-v4.1-flash"
+        ]
+        for nim_model in nim_models:
+            try:
+                print(f"  -> Calling NVIDIA NIM ({nim_model})...")
+                time.sleep(2)
+                return call_nvidia(prompt, model=nim_model, timeout=90)
+            except Exception as e:
+                print(f"  -> NVIDIA NIM ({nim_model}) skipped: {e}")
+
+    if GEMINI_API_KEY:
+        try:
+            print("  -> Failing over to Gemini 3.8 Flash...")
+            time.sleep(12.5)
+            return call_gemini(prompt, model="gemini-3.8-flash", timeout=50)
+        except Exception as e:
+            print(f"  -> Gemini skipped: {e}")
+
+    print("  -> Failing over to Groq 120B...")
+    time.sleep(3)
+    return call_groq(prompt, model="openai/gpt-oss-120b", timeout=50)
 
 def build_docx_resume(job, data):
     os.makedirs("tailored_resumes", exist_ok=True)
@@ -207,7 +277,6 @@ def build_docx_resume(job, data):
         r.font.size = Pt(11)
         r.font.color.rgb = RGBColor(0x1A, 0x4E, 0x8A)
 
-    # Header
     p_name = doc.add_paragraph()
     p_name.paragraph_format.space_after = Pt(1)
     r_name = p_name.add_run("ADIT AGARWAL")
@@ -228,17 +297,14 @@ def build_docx_resume(job, data):
     r_contact.font.size = Pt(9.5)
     r_contact.font.color.rgb = RGBColor(0x44, 0x44, 0x44)
 
-    # Executive Summary
     add_heading_line("Executive Profile")
     p_sum = doc.add_paragraph(data.get("tailored_summary", ""))
     p_sum.paragraph_format.space_after = Pt(4)
 
-    # Core Expertise
     add_heading_line("Core Expertise")
     p_sk = doc.add_paragraph(data.get("tailored_skills", ""))
     p_sk.paragraph_format.space_after = Pt(4)
 
-    # Experience Helper
     def add_role(company_title, subtitle, bullets):
         p_r = doc.add_paragraph()
         p_r.paragraph_format.space_before = Pt(5)
@@ -306,10 +372,10 @@ with open("companies.csv", "r", encoding="utf-8") as f:
                     job["score"] = score
                     job.update(deep)
                     matches.append(job)
-                time.sleep(4.5)  # Stays safely under 15 RPM free limit on gemini-3.5-flash-lite
+                time.sleep(2.2)
             except Exception as e:
                 print(f"AI error on {job['title']}: {e}")
-                time.sleep(5)
+                time.sleep(4)
 
 print(f"Scanned {companies_checked} companies | Triaged {evaluated_count} India/Remote roles | Deep-Researched {len(matches)} matches >= 80.")
 

@@ -3,7 +3,7 @@ name: Daily AI Job Headhunter
 on:
   schedule:
     - cron: '30 2 * * *' # Runs automatically at 8:00 AM IST every day
-  workflow_dispatch:       # Lets you click a button to run it manually anytime
+  workflow_dispatch:       # Lets you click a button to run manually anytime
 
 permissions:
   contents: write
@@ -12,21 +12,24 @@ jobs:
   hunt:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
+      - uses: actions/checkout@v6
+      - uses: actions/setup-python@v7
         with:
-          python-version: '3.11'
-      - run: pip install requests
-      - name: Run AI Job Hunter
+          python-version: '3.13'
+      - run: pip install requests python-docx
+      - name: Refresh 1,000 Company Directory
+        run: python discover_companies.py
+      - name: Run Executive Research Headhunter
         env:
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
           GMAIL_USER: ${{ secrets.GMAIL_USER }}
           GMAIL_APP_PASSWORD: ${{ secrets.GMAIL_APP_PASSWORD }}
+          RESUME_CONTACT_HEADER: ${{ secrets.RESUME_CONTACT_HEADER }}
         run: python hunter.py
-      - name: Save Seen Jobs Memory
+      - name: Save Memory & Company List
         run: |
           git config user.name "JobHunterBot"
           git config user.email "bot@users.noreply.github.com"
-          git add seen_jobs.json
-          git commit -m "Update seen jobs" || exit 0
+          git add seen_jobs.json companies.csv
+          git commit -m "Update seen jobs and 1000 companies" || exit 0
           git push

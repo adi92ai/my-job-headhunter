@@ -1,4 +1,5 @@
 import os, re, csv, json, time, smtplib, requests
+from concurrent.futures import ThreadPoolExecutor, as_completed
 from docx import Document
 from docx.shared import Pt, RGBColor, Inches
 from email.mime.text import MIMEText
@@ -59,13 +60,16 @@ def is_india_eligible(loc_raw):
 
 def clean_html(raw_html):
     text = re.sub(r"<[^>]+>", " ", raw_html or "")
-    return re.sub(r"\s+", " ", text).strip()[:14000]  # Full untruncated JD text
+    return re.sub(r"\s+", " ", text).strip()[:14000]
 
-def fetch_jobs(company, ats, slug):
+def fetch_jobs(row):
+    company = row["company"].strip()
+    ats = row["ats"].strip().lower()
+    slug = row["slug"].strip()
     jobs = []
     try:
         if ats == "greenhouse":
-            r = requests.get(f"https://boards-api.greenhouse.io/v1/boards/{slug}/jobs?content=true", timeout=12).json()
+            r = requests.get(f"https://boards-api.greenhouse.io/v1/boards/{slug}/jobs?content=true", timeout=8).json()
             for j in r.get("jobs", []):
                 jobs.append({
                     "id": f"gh_{j['id']}", "company": company, "title": j["title"],
@@ -73,7 +77,7 @@ def fetch_jobs(company, ats, slug):
                     "url": j["absolute_url"], "desc": clean_html(j.get("content", ""))
                 })
         elif ats == "lever":
-            r = requests.get(f"https://api.lever.co/v0/postings/{slug}", timeout=12).json()
+            r = requests.get(f"https://api.lever.co/v0/postings/{slug}", timeout=8).json()
             if isinstance(r, list):
                 for j in r:
                     jobs.append({
@@ -82,7 +86,7 @@ def fetch_jobs(company, ats, slug):
                         "url": j["hostedUrl"], "desc": clean_html(j.get("descriptionPlain", ""))
                     })
         elif ats == "ashby":
-            r = requests.get(f"https://api.ashbyhq.com/posting-api/job-board/{slug}", timeout=12).json()
+            r = requests.get(f"https://api.ashbyhq.com/posting-api/job-board/{slug}", timeout=8).json()
             for j in r.get("jobs", []):
                 jobs.append({
                     "id": f"ab_{j['id']}", "company": company, "title": j["title"],
@@ -90,7 +94,7 @@ def fetch_jobs(company, ats, slug):
                     "url": j["jobUrl"], "desc": clean_html(j.get("descriptionPlain", ""))
                 })
         elif ats == "smartrecruiters":
-            r = requests.get(f"https://api.smartrecruiters.com/v1/companies/{slug}/postings?limit=100", timeout=12).json()
+            r = requests.get(f"https://api.smartrecruiters.com/v1/companies/{slug}/postings?limit=100", timeout=8).json()
             for j in r.get("content", []):
                 loc_obj = j.get("location", {})
                 loc_str = f"{loc_obj.get('city', '')}, {loc_obj.get('country', '')}"
@@ -101,7 +105,7 @@ def fetch_jobs(company, ats, slug):
                     "desc": clean_html(j.get("jobAd", {}).get("sections", {}).get("jobDescription", {}).get("text", j["name"]))
                 })
         elif ats == "workable":
-            r = requests.get(f"https://apply.workable.com/api/v1/widget/accounts/{slug}", timeout=12).json()
+            r = requests.get(f"https://apply.workable.com/api/v1/widget/accounts/{slug}", timeout=8).json()
             for j in r.get("jobs", []):
                 jobs.append({
                     "id": f"wk_{j['shortcode']}", "company": company, "title": j["title"],
@@ -114,7 +118,7 @@ def fetch_jobs(company, ats, slug):
                 tenant, wd_num, site = parts
                 wd_url = f"https://{tenant}.{wd_num}.myworkdayjobs.com/wday/cxs/{tenant}/{site}/jobs"
                 payload = {"appliedFacets": {}, "limit": 20, "offset": 0, "searchText": "India"}
-                r = requests.post(wd_url, json=payload, headers={"Content-Type": "application/json"}, timeout=15).json()
+                r = requests.post(wd_url, json=payload, headers={"Content-Type": "application/json"}, timeout=10).json()
                 for j in r.get("jobPostings", []):
                     ext_path = j.get("externalPath", "")
                     jobs.append({
@@ -178,7 +182,6 @@ def call_gemini(prompt, model="gemini-3.8-flash", timeout=45):
         return extract_json_safely(res["candidates"][0]["content"]["parts"][0]["text"])
     raise RuntimeError(f"Gemini API Response: {res}")
 
-# STAGE A ($0 Groq Free Tier): Fast Triage on Full Untruncated JD
 def triage_job(job):
     prompt = f"""Score this job 0-100 against Adit Agarwal's resume and preferences (12+ yrs exp: leads Business Analytics for ServiceNow's $10B+ DGTM org, $1.2B+ quantified impact at Amazon, P&L founder).
 Reserve 80+ ONLY for true Manager, Senior Manager, Director, or Head roles in India/Remote matching Analytics, RevOps, GTM, or Commercial Strategy.
@@ -196,7 +199,6 @@ FULL DESCRIPTION:
         time.sleep(3)
         return call_groq(prompt, model="llama-3.3-70b-versatile", timeout=30)
 
-# STAGE B ($0 NVIDIA NIM Mistral-Large-4-1T-A52B -> Nemotron-3-Ultra-550B -> DeepSeek-V4.1-Flash -> Gemini 3.8 Flash -> Groq 120B)
 def deep_research_and_touchup(job):
     prompt = f"""You are an elite executive career strategist preparing Adit Agarwal for a high-priority application.
 Perform deep role research AND a surgical "Touch-Up Mode" tailoring of Adit's resume for this exact job.
@@ -337,18 +339,18 @@ def build_docx_resume(job, data):
     doc.save(filename)
     return filename
 
-matches = []
-attachments = []
-evaluated_count = 0
-companies_checked = 0
-
+# 1. Parallel fetch across all company boards (~15 seconds total)
+t0 = time.time()
 with open("companies.csv", "r", encoding="utf-8") as f:
-    for row in csv.DictReader(f):
-        companies_checked += 1
-        for job in fetch_jobs(row["company"], row["ats"].strip().lower(), row["slug"].strip()):
+    company_rows = list(csv.DictReader(f))
+
+candidate_jobs = []
+with ThreadPoolExecutor(max_workers=20) as pool:
+    futures = [pool.submit(fetch_jobs, row) for row in company_rows]
+    for fut in as_completed(futures):
+        for job in fut.result():
             if job["id"] in seen_jobs:
                 continue
-
             title_lower = job["title"].lower()
             if not is_india_eligible(job["location"]):
                 seen_jobs.add(job["id"])
@@ -356,28 +358,37 @@ with open("companies.csv", "r", encoding="utf-8") as f:
             if not any(k in title_lower for k in INCLUDE_KEYWORDS) or any(k in title_lower for k in EXCLUDE_KEYWORDS):
                 seen_jobs.add(job["id"])
                 continue
+            candidate_jobs.append(job)
 
-            try:
-                evaluated_count += 1
-                triage = triage_job(job)
-                seen_jobs.add(job["id"])
-                score = triage.get("score", 0)
-                print(f"Triaged [{score}/100]: {job['title']} @ {job['company']}")
+print(f"Fetched {len(company_rows)} companies in {time.time() - t0:.1f}s | {len(candidate_jobs)} new India/Remote leadership roles to triage.")
 
-                if score >= 80:
-                    print(f"  -> Generating Executive Research & Touch-Up .docx Resume for {job['company']}...")
-                    deep = deep_research_and_touchup(job)
-                    docx_path = build_docx_resume(job, deep)
-                    attachments.append(docx_path)
-                    job["score"] = score
-                    job.update(deep)
-                    matches.append(job)
-                time.sleep(2.2)
-            except Exception as e:
-                print(f"AI error on {job['title']}: {e}")
-                time.sleep(4)
+# 2. Fast Groq Triage + NVIDIA NIM Executive Touch-Up Resumes
+matches = []
+attachments = []
+evaluated_count = 0
 
-print(f"Scanned {companies_checked} companies | Triaged {evaluated_count} India/Remote roles | Deep-Researched {len(matches)} matches >= 80.")
+for job in candidate_jobs:
+    try:
+        evaluated_count += 1
+        triage = triage_job(job)
+        seen_jobs.add(job["id"])
+        score = triage.get("score", 0)
+        print(f"Triaged [{score}/100]: {job['title']} @ {job['company']}")
+
+        if score >= 80:
+            print(f"  -> Generating Executive Research & Touch-Up .docx Resume for {job['company']}...")
+            deep = deep_research_and_touchup(job)
+            docx_path = build_docx_resume(job, deep)
+            attachments.append(docx_path)
+            job["score"] = score
+            job.update(deep)
+            matches.append(job)
+        time.sleep(2.2)
+    except Exception as e:
+        print(f"AI error on {job['title']}: {e}")
+        time.sleep(4)
+
+print(f"Triaged {evaluated_count} roles | Deep-Researched {len(matches)} matches >= 80.")
 
 with open(SEEN_FILE, "w", encoding="utf-8") as f:
     json.dump(list(seen_jobs), f)
@@ -385,7 +396,7 @@ with open(SEEN_FILE, "w", encoding="utf-8") as f:
 if matches:
     matches.sort(key=lambda x: x["score"], reverse=True)
     html = f"<h2>🎯 Executive Headhunter Brief + Touch-Up Resumes ({len(matches)} Priority Matches)</h2>"
-    html += "<p style='color:#555;'>Tailored <b>.docx resumes</b> (with your private contact header pre-filled) are attached below—ready to review and export to PDF.</p>"
+    html += "<p style='color:#555;'>Tailored <b>.docx resumes</b> (powered by Mistral Large 4 with your private contact header pre-filled) are attached below—ready to review and export to PDF.</p>"
     for m in matches:
         diff_html = "".join(f"<li>{d}</li>" for d in m.get("touchup_diff", []))
         html += f"""

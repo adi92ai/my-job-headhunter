@@ -103,11 +103,11 @@ def fetch_jobs(raw_row):
     ats = (row.get("ats") or row.get("platform") or "").lower()
     slug = row.get("slug") or row.get("board") or ""
     jobs = []
-    if not ats or not slug:
+    if not ats or not slug or company.lower() == "servicenow":
         return jobs
     try:
         if ats == "greenhouse":
-            r = requests.get(f"https://boards-api.greenhouse.io/v1/boards/{slug}/jobs?content=true", timeout=10).json()
+            r = requests.get(f"https://boards-api.greenhouse.io/v1/boards/{slug}/jobs?content=true", timeout=12).json()
             for j in r.get("jobs", []):
                 jobs.append({
                     "id": f"gh_{j['id']}", "company": company, "title": j["title"],
@@ -115,7 +115,7 @@ def fetch_jobs(raw_row):
                     "url": j["absolute_url"], "desc": clean_html(j.get("content", ""))
                 })
         elif ats == "lever":
-            r = requests.get(f"https://api.lever.co/v0/postings/{slug}", timeout=10).json()
+            r = requests.get(f"https://api.lever.co/v0/postings/{slug}", timeout=12).json()
             if isinstance(r, list):
                 for j in r:
                     jobs.append({
@@ -124,7 +124,7 @@ def fetch_jobs(raw_row):
                         "url": j["hostedUrl"], "desc": clean_html(j.get("descriptionPlain", ""))
                     })
         elif ats == "ashby":
-            r = requests.get(f"https://api.ashbyhq.com/posting-api/job-board/{slug}", timeout=10).json()
+            r = requests.get(f"https://api.ashbyhq.com/posting-api/job-board/{slug}", timeout=12).json()
             for j in r.get("jobs", []):
                 jobs.append({
                     "id": f"ab_{j['id']}", "company": company, "title": j["title"],
@@ -132,7 +132,7 @@ def fetch_jobs(raw_row):
                     "url": j["jobUrl"], "desc": clean_html(j.get("descriptionPlain", ""))
                 })
         elif ats == "smartrecruiters":
-            r = requests.get(f"https://api.smartrecruiters.com/v1/companies/{slug}/postings?limit=100", timeout=10).json()
+            r = requests.get(f"https://api.smartrecruiters.com/v1/companies/{slug}/postings?limit=100", timeout=12).json()
             for j in r.get("content", []):
                 loc_obj = j.get("location", {})
                 loc_str = f"{loc_obj.get('city', '')}, {loc_obj.get('country', '')}"
@@ -143,7 +143,7 @@ def fetch_jobs(raw_row):
                     "desc": clean_html(j.get("jobAd", {}).get("sections", {}).get("jobDescription", {}).get("text", j["name"]))
                 })
         elif ats == "workable":
-            r = requests.get(f"https://apply.workable.com/api/v1/widget/accounts/{slug}", timeout=10).json()
+            r = requests.get(f"https://apply.workable.com/api/v1/widget/accounts/{slug}", timeout=12).json()
             for j in r.get("jobs", []):
                 jobs.append({
                     "id": f"wk_{j['shortcode']}", "company": company, "title": j["title"],
@@ -156,7 +156,7 @@ def fetch_jobs(raw_row):
                 tenant, wd_num, site = parts
                 wd_url = f"https://{tenant}.{wd_num}.myworkdayjobs.com/wday/cxs/{tenant}/{site}/jobs"
                 payload = {"appliedFacets": {}, "limit": 20, "offset": 0, "searchText": "India"}
-                r = requests.post(wd_url, json=payload, headers={"Content-Type": "application/json"}, timeout=12).json()
+                r = requests.post(wd_url, json=payload, headers={"Content-Type": "application/json"}, timeout=15).json()
                 for j in r.get("jobPostings", []):
                     ext_path = j.get("externalPath", "")
                     jobs.append({
@@ -177,7 +177,7 @@ def extract_json_safely(raw_text):
         cleaned = cleaned[start:end+1]
     return json.loads(cleaned)
 
-def call_nvidia(prompt, model="mistralai/mistral-large-4-1t-a52b", timeout=90):
+def call_nvidia(prompt, model="nvidia/nemotron-3-ultra-550b-a55b", timeout=90):
     url = "https://integrate.api.nvidia.com/v1/chat/completions"
     headers = {"Authorization": f"Bearer {NVIDIA_API_KEY}", "Content-Type": "application/json"}
     payload = {
@@ -187,7 +187,7 @@ def call_nvidia(prompt, model="mistralai/mistral-large-4-1t-a52b", timeout=90):
             {"role": "user", "content": prompt}
         ],
         "temperature": 0.3,
-        "max_tokens": 8192
+        "max_tokens": 4096
     }
     res = requests.post(url, headers=headers, json=payload, timeout=timeout).json()
     if "choices" in res:
@@ -222,7 +222,7 @@ def call_gemini(prompt, model="gemini-3.8-flash", timeout=45):
 
 def triage_job(job):
     prompt = f"""Score this job 0-100 against Adit Agarwal's resume and preferences (12+ yrs exp: leads Business Analytics for ServiceNow's $10B+ DGTM org, $1.2B+ quantified impact at Amazon, P&L founder).
-Reserve 80+ ONLY for true Manager, Senior Manager, Director, or Head roles in India/Remote matching Analytics, RevOps, GTM, or Commercial Strategy.
+Reserve 75+ ONLY for true Manager, Senior Manager, Director, or Head roles in India/Remote matching Analytics, RevOps, GTM, or Commercial Strategy.
 Return ONLY valid JSON: {{"score": integer, "quick_reason": "1 sentence"}}
 
 RESUME:
@@ -231,11 +231,15 @@ RESUME:
 JOB: {job['title']} at {job['company']} ({job['location']})
 FULL DESCRIPTION:
 {job['desc']}"""
-    try:
-        return call_groq(prompt, model="openai/gpt-oss-120b", timeout=30)
-    except Exception:
-        time.sleep(3)
-        return call_groq(prompt, model="llama-3.3-70b-versatile", timeout=30)
+    for attempt_model in ["openai/gpt-oss-120b", "openai/gpt-oss-20b", "meta-llama/llama-4-scout-17b-16e-instruct"]:
+        try:
+            return call_groq(prompt, model=attempt_model, timeout=30)
+        except Exception as e:
+            if "rate_limit" in str(e).lower() or "429" in str(e):
+                time.sleep(8)
+            else:
+                time.sleep(2)
+    raise RuntimeError("All Groq triage models failed")
 
 def deep_research_and_touchup(job):
     prompt = f"""You are an elite executive career strategist preparing Adit Agarwal for a high-priority application.
@@ -270,7 +274,6 @@ FULL JOB DESCRIPTION:
     raw_result = None
     if NVIDIA_API_KEY:
         nim_models = [
-            "mistralai/mistral-large-4-1t-a52b",
             "nvidia/nemotron-3-ultra-550b-a55b",
             "deepseek-ai/deepseek-v4.1-flash"
         ]
@@ -283,6 +286,11 @@ FULL JOB DESCRIPTION:
             except Exception as e:
                 print(f"  -> NVIDIA NIM ({nim_model}) skipped: {e}")
 
+    if raw_result is None:
+        print("  -> Failing over to Groq 120B...")
+        time.sleep(3)
+        raw_result = call_groq(prompt, model="openai/gpt-oss-120b", timeout=50)
+
     if raw_result is None and GEMINI_API_KEY:
         try:
             print("  -> Failing over to Gemini 3.8 Flash...")
@@ -290,11 +298,6 @@ FULL JOB DESCRIPTION:
             raw_result = call_gemini(prompt, model="gemini-3.8-flash", timeout=50)
         except Exception as e:
             print(f"  -> Gemini skipped: {e}")
-
-    if raw_result is None:
-        print("  -> Failing over to Groq 120B...")
-        time.sleep(3)
-        raw_result = call_groq(prompt, model="openai/gpt-oss-120b", timeout=50)
 
     return normalize_ai_payload(raw_result)
 
@@ -383,7 +386,7 @@ def build_docx_resume(job, data):
     doc.save(filename)
     return filename
 
-# 1. Parallel fetch across all company boards (~15 seconds total)
+# 1. Parallel fetch across all company boards (~16 seconds total)
 t0 = time.time()
 with open("companies.csv", "r", encoding="utf-8") as f:
     reader = csv.DictReader(f)
@@ -392,7 +395,7 @@ with open("companies.csv", "r", encoding="utf-8") as f:
 
 total_raw_jobs = 0
 candidate_jobs = []
-with ThreadPoolExecutor(max_workers=20) as pool:
+with ThreadPoolExecutor(max_workers=12) as pool:
     futures = [pool.submit(fetch_jobs, row) for row in company_rows]
     for fut in as_completed(futures):
         fetched = fut.result()
@@ -424,7 +427,7 @@ for job in candidate_jobs:
         score = triage.get("score", 0)
         print(f"Triaged [{score}/100]: {job['title']} @ {job['company']}")
 
-        if score >= 80:
+        if score >= 75:
             print(f"  -> Generating Executive Research & Touch-Up .docx Resume for {job['company']}...")
             deep = deep_research_and_touchup(job)
             docx_path = build_docx_resume(job, deep)
@@ -432,12 +435,12 @@ for job in candidate_jobs:
             job["score"] = score
             job.update(deep)
             matches.append(job)
-        time.sleep(2.2)
+        time.sleep(2.5)
     except Exception as e:
         print(f"AI error on {job['title']}: {e}")
         time.sleep(4)
 
-print(f"Triaged {evaluated_count} roles | Deep-Researched {len(matches)} matches >= 80.")
+print(f"Triaged {evaluated_count} roles | Deep-Researched {len(matches)} matches >= 75.")
 
 with open(SEEN_FILE, "w", encoding="utf-8") as f:
     json.dump(list(seen_jobs), f)
@@ -478,4 +481,4 @@ if matches:
         server.send_message(msg)
     print(f"Sent {len(matches)} executive briefs + .docx attachments!")
 else:
-    print("No new matches >= 80 today.")
+    print("No new matches >= 75 today.")

@@ -193,7 +193,6 @@ Relaypro,greenhouse,relaypro
 Doordashcanada,greenhouse,doordashcanada
 Workshop,greenhouse,workshop
 Nationallifeinsurancecompany,greenhouse,nationallifeinsurancecompany
-Scaleai,greenhouse,scaleai
 Gofundme,greenhouse,gofundme
 C3ascend,greenhouse,c3ascend
 Farmersmutualhailinsurancecompany,greenhouse,farmersmutualhailinsurancecompany
@@ -209,6 +208,7 @@ Divergent,greenhouse,divergent
 Thealleninstitute,greenhouse,thealleninstitute
 Idmeuniversityrecruiting,greenhouse,idmeuniversityrecruiting
 Eqtcorporation,greenhouse,eqtcorporation
+Scaleai,greenhouse,scaleai
 Togetherai,greenhouse,togetherai
 Ruggedrobotics,greenhouse,ruggedrobotics
 Datacor,greenhouse,datacor
@@ -224,8 +224,8 @@ Hpiq,greenhouse,hpiq
 Parallel,greenhouse,parallel
 Atoms,greenhouse,atoms
 Cssmerge,greenhouse,cssmerge
-Matillion,lever,matillion
 Shieldai,lever,shieldai
+Matillion,lever,matillion
 Matchgroup,lever,matchgroup
 Zoox,lever,zoox
 Futo-org,lever,futo-org
@@ -255,7 +255,6 @@ Uipath,ashby,uipath
 Formulary,ashby,formulary
 Category-labs,ashby,category-labs
 Geniusai,ashby,geniusai
-Gearset,ashby,gearset
 Hiya,ashby,hiya
 Telus-digital,ashby,telus-digital
 Integrate,ashby,integrate
@@ -271,7 +270,6 @@ Decagon,ashby,decagon
 Gecko-robotics,ashby,gecko-robotics
 Talos-trading,ashby,Talos-Trading
 Withpace,ashby,withpace
-Snowflake,ashby,snowflake
 Persona,ashby,persona
 Scout-ai,ashby,scout-ai
 Metamorphic,ashby,metamorphic
@@ -299,6 +297,7 @@ Renesaselectronics,smartrecruiters,RenesasElectronics
 Paconsulting,smartrecruiters,PAConsulting
 Twitch,greenhouse,twitch
 Getbuilt,greenhouse,getbuilt
+Thoughtworksreferral,greenhouse,thoughtworksreferral
 Sirenopt,greenhouse,sirenopt
 Clear,greenhouse,clear
 Machindustries,greenhouse,machindustries
@@ -384,6 +383,7 @@ Goaly,ashby,goaly
 Backbone,ashby,backbone
 Xterra,ashby,xterra
 Preference-model,ashby,Preference-Model
+Snowflake,ashby,snowflake
 Aescape,ashby,aescape
 Morse-micro,ashby,morse-micro
 Icon,ashby,icon

@@ -2,8 +2,8 @@ name: Daily AI Job Headhunter
 
 on:
   schedule:
-    - cron: '0 3 * * *'   # Runs at 8:30 AM IST every day
-    - cron: '0 13 * * *'  # Runs at 6:30 PM IST every day
+    - cron: '17 3 * * *'   # Runs at 8:47 AM IST every day
+    - cron: '17 13 * * *'  # Runs at 6:47 PM IST every day
   workflow_dispatch:       # Lets you click a button to run manually anytime
 
 permissions:

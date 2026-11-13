@@ -155,6 +155,7 @@ Deutsche Bank,workday,db|wd3|DBWebsite
 AstraZeneca,workday,astrazeneca|wd3|Careers
 Novartis,workday,novartis|wd3|Novartis_Careers
 Schneider Electric,workday,schneiderelectric|wd3|SE_Careers
+Muonspace,greenhouse,muonspace
 Addepar1,greenhouse,addepar1
 Scoutmotors,greenhouse,scoutmotors
 Deeplocal,greenhouse,deeplocal
@@ -173,7 +174,6 @@ Graphcore,greenhouse,graphcore
 Graphcore-early-careers,greenhouse,graphcore-early-careers
 Inversionspace,greenhouse,inversionspace
 Rothesaygraduates,greenhouse,rothesaygraduates
-Muonspace,greenhouse,muonspace
 Point72,greenhouse,point72
 Embed,greenhouse,embed
 Gcmgrosvenor,greenhouse,gcmgrosvenor
@@ -197,6 +197,8 @@ Scaleai,greenhouse,scaleai
 Gofundme,greenhouse,gofundme
 C3ascend,greenhouse,c3ascend
 Farmersmutualhailinsurancecompany,greenhouse,farmersmutualhailinsurancecompany
+Stratolaunch,greenhouse,stratolaunch
+Stackav,greenhouse,stackav
 Sharkninjaoperatingllc,greenhouse,sharkninjaoperatingllc
 Woolpert,greenhouse,woolpert
 Enova,greenhouse,enova
@@ -204,7 +206,6 @@ Duolingounirecruitment,greenhouse,duolingounirecruitment
 Samsungresearchamericainternship,greenhouse,samsungresearchamericainternship
 Jomboymedia,greenhouse,jomboymedia
 Divergent,greenhouse,divergent
-Stratolaunch,greenhouse,stratolaunch
 Thealleninstitute,greenhouse,thealleninstitute
 Idmeuniversityrecruiting,greenhouse,idmeuniversityrecruiting
 Eqtcorporation,greenhouse,eqtcorporation
@@ -223,7 +224,6 @@ Hpiq,greenhouse,hpiq
 Parallel,greenhouse,parallel
 Atoms,greenhouse,atoms
 Cssmerge,greenhouse,cssmerge
-Rendezvousrobotics,greenhouse,rendezvousrobotics
 Matillion,lever,matillion
 Shieldai,lever,shieldai
 Matchgroup,lever,matchgroup
@@ -245,6 +245,7 @@ Pivotal,lever,pivotal
 Cesiumastro,lever,CesiumAstro
 Loftorbital,lever,loftorbital
 Upscale-ai,lever,upscale-ai
+Vital-lyfe,ashby,vital-lyfe
 F7d8749a-72d6-407c-bf98-292ea630c73a,ashby,f7d8749a-72d6-407c-bf98-292ea630c73a
 Shield,ashby,shield
 Skydio,ashby,skydio
@@ -273,7 +274,6 @@ Snowflake,ashby,snowflake
 Persona,ashby,persona
 Scout-ai,ashby,scout-ai
 Metamorphic,ashby,metamorphic
-Tacit,ashby,tacit
 Pangramlabs,ashby,pangramlabs
 Dandy,ashby,dandy
 Ibotta,ashby,ibotta
@@ -316,7 +316,6 @@ Perpay,greenhouse,perpay
 Trueanomalyinc,greenhouse,trueanomalyinc
 Spacex,greenhouse,spacex
 Intersystems,greenhouse,intersystems
-Teletrackingtechnologiesinc,greenhouse,teletrackingtechnologiesinc
 Humaninterestswe1,greenhouse,humaninterestswe1
 Darkwolfsolutions,greenhouse,darkwolfsolutions
 Newsbreak,greenhouse,newsbreak
@@ -327,12 +326,11 @@ Aquaticcapitalmanagement,greenhouse,aquaticcapitalmanagement
 Blenheimchalcot,greenhouse,blenheimchalcot
 Akunacapitaloci,greenhouse,akunacapitaloci
 Transmarketgroup,greenhouse,transmarketgroup
-Rocketlab,greenhouse,rocketlab
 Ultimagenomics,greenhouse,ultimagenomics
 Undercontrolroboticsinc,greenhouse,undercontrolroboticsinc
+Rendezvousrobotics,greenhouse,rendezvousrobotics
 Freeformfuturecorp,greenhouse,freeformfuturecorp
 Generalmatter,greenhouse,generalmatter
-Crosscountry-consulting,lever,crosscountry-consulting
 Palantir,lever,palantir
 Bloomon,lever,bloomon
 Steerbridge,lever,steerbridge
@@ -369,7 +367,6 @@ Bridger,ashby,bridger
 Rollout,ashby,rollout
 Stradahq,ashby,stradahq
 Netic,ashby,netic
-Lightfield,ashby,Lightfield
 Faros-ai,ashby,faros-ai
 Old-mission-capital,ashby,old-mission-capital
 Pylon-labs,ashby,pylon-labs

@@ -7,12 +7,14 @@ company,ats,slug
 9to9softwaresolutionsllc,smartrecruiters,9to9SoftwareSolutionsLLC
 AB InBev,greenhouse,abinbev
 Abacum,ashby,abacum
+Abbott,workday,abbott|wd5|abbottcareers
 Abbvie,smartrecruiters,AbbVie
 Abundant,ashby,abundant
 Accor,smartrecruiters,Accor
 Accord,ashby,accord
 ACLU,greenhouse,aclu
 Adaptyv,ashby,adaptyv
+Adclear,ashby,adclear
 Addepar1,greenhouse,addepar1
 adjoe,ashby,adjoe
 Adobe,workday,adobe|wd5|external_experienced
@@ -35,6 +37,7 @@ Airtable,lever,airtable
 Airtable,greenhouse,airtable
 Akido Labs,greenhouse,akidolabs
 Akunacapitaloci,greenhouse,akunacapitaloci
+Alassio,ashby,alassio
 Albedo,greenhouse,albedo
 Albiware Inc.,smartrecruiters,Albiwareinc
 Alchemy,ashby,alchemy
@@ -48,14 +51,18 @@ Alloy,lever,alloy
 Alma31,greenhouse,alma31
 Almetra,ashby,almetra
 Alpaca,greenhouse,alpaca
+Alphasense,greenhouse,alphasense
 Alstom,smartrecruiters,Alstom
 Alta Ares,ashby,alta-ares
 Ambition,ashby,ambition
+AMBOSS,ashby,amboss
 Ambral,ashby,ambral
 Amca,greenhouse,amca
 Amplify,ashby,amplify
 Amplitude,greenhouse,amplitude
+Analog Devices,workday,analogdevices|wd1|External
 Ande,ashby,ande
+Andercore,ashby,andercore
 Andromeda Surgical,ashby,andromedasurgical
 Andurilindustries,greenhouse,andurilindustries
 Angle Health,ashby,anglehealth
@@ -71,6 +78,8 @@ Apolink,ashby,apolink
 Apollo,ashby,apollo
 Apollo.io,greenhouse,apolloio
 Applied,ashby,applied
+Applied Materials,workday,amat|wd1|External
+Aptura,ashby,aptura
 Aqua Voice,ashby,aqua-voice
 Aquaticcapitalmanagement,greenhouse,aquaticcapitalmanagement
 Aragorn AI,ashby,aragorn
@@ -115,6 +124,7 @@ Aurora-operations-inc,ashby,aurora-operations-inc
 Auterion,greenhouse,auterion
 Authenticinsurance,greenhouse,authenticinsurance
 authzed,ashby,authzed
+Autodesk,workday,autodesk|wd1|Ext
 Automat,ashby,automat
 Autonomous Technologies Group,lever,autonomous
 autoscout24,greenhouse,autoscout24
@@ -146,18 +156,21 @@ Bird,greenhouse,bird
 Birdie,ashby,birdie
 Bitmovin,greenhouse,bitmovin
 Bitstack,ashby,bitstack
+BlackRock,workday,blackrock|wd1|BlackRock_Professional
 Blacksmith,ashby,blacksmith
 Bland AI,ashby,bland
 Blee,ashby,blee
 Blenheimchalcot,greenhouse,blenheimchalcot
 Blissway,ashby,blissway
 Block,greenhouse,block
+Blocktech,ashby,blocktech
 Bloom,lever,bloom
 Bloom,smartrecruiters,Bloom
 Bloomon,lever,bloomon
 Blue,lever,blue
 Blueberry Pediatrics,ashby,blueberrypediatrics
 Bluedot,ashby,bluedot
+Boeing,workday,boeing|wd1|EXTERNAL_CAREERS
 Bolna AI,ashby,bolna
 Bolster,lever,bolster
 Booking.com,greenhouse,booking
@@ -166,6 +179,7 @@ Boostly,ashby,boostly
 BootLoop,ashby,bootloop
 Bosch,smartrecruiters,BoschGroup
 Bosonai,lever,bosonai
+Bowatt,ashby,bowatt
 Box,greenhouse,box
 Box,greenhouse,boxinc
 Brainbase Labs,ashby,brainbaselabs
@@ -179,6 +193,7 @@ Brighterway,ashby,brighterway
 Broccoli AI,ashby,broccoli
 BrowserStack,greenhouse,browserstack
 Brumby,ashby,brumby
+Buena,ashby,buena
 BukuWarung,smartrecruiters,Bukuwarung
 Bunkerhill Health,ashby,bunkerhillhealth
 Bureau,ashby,bureau
@@ -186,6 +201,8 @@ burnt,greenhouse,burnt
 Bursonglobalcareers,greenhouse,bursonglobalcareers
 Butter,ashby,butter
 C3ascend,greenhouse,c3ascend
+Cadence,workday,cadence|wd1|External_Careers
+Callosum,ashby,callosum
 Camber,ashby,camber
 Cambio,ashby,cambio
 Cambly,ashby,cambly
@@ -225,6 +242,7 @@ Chariot,ashby,chariot
 Checkr,greenhouse,checkr
 Chestnut,ashby,chestnut
 Chime,greenhouse,chime
+Cigna,workday,cigna|wd5|cignacareers
 Cinder,ashby,cinder
 Circleback,ashby,circleback
 CircleCI,greenhouse,circleci
@@ -263,6 +281,7 @@ Complir,ashby,complir
 Composio,ashby,composio
 Concourse,ashby,concourse
 Conduit,ashby,conduit
+Condukt,ashby,condukt
 Confido,ashby,confido
 Confluent,greenhouse,confluent
 Constellation Space,ashby,constellationspace
@@ -303,6 +322,7 @@ Databricks,greenhouse,databricks
 Datacor,greenhouse,datacor
 Datadog,greenhouse,datadog
 Datafold,ashby,datafold
+Dataguard,ashby,dataguard
 Dataiku,greenhouse,dataiku
 Datalabusa,lever,datalabusa
 Dataleap,ashby,dataleap
@@ -333,6 +353,7 @@ Distro,lever,distro
 Ditto,ashby,ditto
 Divergent,greenhouse,divergent
 Docker,ashby,docker
+Doctolib,ashby,doctolib
 DocuSign,greenhouse,docusign
 Dodo,ashby,dodo
 Doe,ashby,doe
@@ -452,6 +473,7 @@ Freshpaint,ashby,freshpaint
 Freshworks,greenhouse,freshworks
 Freshworks,smartrecruiters,Freshworks
 Fulcrum,ashby,fulcrum
+Fullenrich,ashby,fullenrich
 FurtherAI,ashby,furtherai
 Fuse,ashby,fuse
 Futo-org,lever,futo-org
@@ -460,10 +482,12 @@ Gardacp,greenhouse,gardacp
 Gcmgrosvenor,greenhouse,gcmgrosvenor
 Gdmsi,smartrecruiters,GDMSI
 Gecko-robotics,ashby,gecko-robotics
+Gen Digital,ashby,gen-digital
 General Astronautics,ashby,generalastronautics
 General Proximity,greenhouse,generalproximity
 Generalmatter,greenhouse,generalmatter
 Genesis-molecular-ai,ashby,genesis-molecular-ai
+Genesys,workday,genesys|wd1|Genesys
 Geniusai,ashby,geniusai
 Getbuilt,greenhouse,getbuilt
 Gigs,greenhouse,gigs
@@ -476,11 +500,13 @@ Glide,greenhouse,glide
 Glide,ashby,glide
 Glide,lever,glide
 Glimpse,ashby,glimpse
+Globalwebindex,greenhouse,globalwebindex
 Goaly,ashby,goaly
 GOAT Group,greenhouse,goatgroup
 Gofundme,greenhouse,gofundme
 GoLinks,ashby,golinks
 Gong,greenhouse,gongio
+Goodstack,ashby,goodstack
 GoTo,greenhouse,goto
 GovDash,ashby,govdash
 GovEagle,ashby,goveagle
@@ -496,6 +522,7 @@ Greptile,ashby,greptile
 Grey,greenhouse,grey
 Gridware,lever,gridware
 Groww,greenhouse,groww
+GSK,workday,gsk|wd5|GSKCareers
 GUILD,greenhouse,guild
 GUILD,ashby,guild
 Gumloop,ashby,gumloop
@@ -518,6 +545,7 @@ Hasura,greenhouse,hasura
 Haven,greenhouse,haven
 Hawkeyeinnovations,ashby,hawkeyeinnovations
 Hazel,greenhouse,hazel
+Hcompany,ashby,hcompany
 Headlandstechnologiesllc,greenhouse,headlandstechnologiesllc
 HealthSherpa,ashby,healthsherpa
 Healthtech 1,ashby,healthtech-1
@@ -544,6 +572,7 @@ Hopper,ashby,hopper
 Hotplate,ashby,hotplate
 housinganywhere,greenhouse,housinganywhere
 HP,greenhouse,hp
+HP,workday,hp|wd5|ExternalCareerSite
 Hpiq,greenhouse,hpiq
 Hubble Network,greenhouse,hubblenetwork
 HubSpot,greenhouse,hubspot
@@ -593,6 +622,7 @@ isaraerospace,greenhouse,isaraerospace
 Ixigo,smartrecruiters,Ixigo
 Jampack-ai,ashby,jampack-ai
 Jeevy Fabrication,ashby,jeevyfabrication
+Jellyfish,ashby,jellyfish
 JFrog,greenhouse,jfrog
 Jiga,ashby,jiga
 Jomboymedia,greenhouse,jomboymedia
@@ -603,8 +633,10 @@ Junction,ashby,junction
 Juno,greenhouse,juno
 Kalshi,greenhouse,kalshi
 Kalshi,ashby,kalshi
+Kaluza,ashby,kaluza
 Kastle,ashby,kastle
 KERNEL,ashby,kernel
+Keyrock,ashby,keyrock
 Khatabook,workable,khatabook
 Kingdom,ashby,kingdom
 Kinter,lever,kinter
@@ -612,14 +644,17 @@ Kite,ashby,kite
 Kivo Health,ashby,kivo-health
 Kiwi,ashby,kiwi
 Klaviyo,greenhouse,klaviyo
+Klaviyo,ashby,klaviyo
 knowbe4,greenhouse,knowbe4
 Knowtex,ashby,knowtex
 Koahlabs,ashby,koahlabs
+Koboldmetals,greenhouse,koboldmetals
 Kodex,ashby,kodex
 Kodo,smartrecruiters,Kodo
 Kombo,ashby,kombo
 Kombo,smartrecruiters,Kombo
 KONE,smartrecruiters,KONE
+Kong,ashby,kong
 Kore.ai,smartrecruiters,Koreai
 Ladder,ashby,ladder
 Lance,ashby,lance
@@ -637,6 +672,7 @@ Legora,ashby,legora
 LemFi,ashby,lemfi
 Lemlist,ashby,lemlist
 Lemon.io,ashby,lemon-io
+Leovegasgroup,ashby,leovegasgroup
 Licious,lever,licious
 Lightdash,ashby,lightdash
 Lightmatter,greenhouse,lightmatter
@@ -647,6 +683,8 @@ Lio (formerly askLio),ashby,lio
 LiteLLM,ashby,litellm
 Litmus,ashby,litmus
 LiveFlow,ashby,liveflow
+Livekit,ashby,livekit
+Livescore9,greenhouse,livescore9
 Llnl,smartrecruiters,LLNL
 Lob,greenhouse,lob
 Loftorbital,lever,loftorbital
@@ -689,8 +727,10 @@ May Mobility,greenhouse,maymobility
 Maya Labs,lever,maya
 Meadow,ashby,meadow
 Mednet,ashby,mednet
+Medtronic,workday,medtronic|wd1|MedtronicCareers
 Meesho,greenhouse,meesho
 Meesho,lever,meesho
+Meetdavis,ashby,meetdavis
 Mem0,ashby,mem0
 Meow,ashby,meow
 Mercura,ashby,mercura
@@ -706,7 +746,9 @@ Method,ashby,method
 Meticulous,ashby,meticulous
 Metriport,ashby,metriport
 mewssystems,greenhouse,mewssystems
+Micron,workday,micron|wd1|External
 Middesk,ashby,middesk
+Mindpeak,ashby,mindpeak
 Mindtickle,greenhouse,mindtickle
 Mindtickle,lever,mindtickle
 Mindtickle,smartrecruiters,Mindtickle
@@ -733,6 +775,7 @@ Monte Carlo,ashby,montecarlodata
 Montu Uk,ashby,montu-uk
 Moonshot,ashby,moonshot
 Moonshot,greenhouse,moonshot
+Morgan Stanley,workday,ms|wd5|External
 Morph,greenhouse,morph
 Morse-micro,ashby,morse-micro
 Mosaic,ashby,mosaic
@@ -750,6 +793,7 @@ N8N,ashby,n8n
 Nabis,greenhouse,nabis
 Nango,ashby,nango
 Nasdaq,greenhouse,nasdaq
+Nasdaq,workday,nasdaq|wd1|Global_External_Site
 Nash,ashby,nash
 Nationallifeinsurancecompany,greenhouse,nationallifeinsurancecompany
 Natuvion GmbH,smartrecruiters,Natuviongmbh
@@ -775,6 +819,7 @@ Nex,greenhouse,nex
 Nextcenturycorporation,smartrecruiters,NextCenturyCorporation
 Nexus,greenhouse,nexus
 NielsenIQ,smartrecruiters,NielsenIQ
+Nike,workday,nike|wd1|nke
 Nira Energy,greenhouse,niraenergy
 Nivoda,ashby,nivoda
 Nooks,ashby,nooks
@@ -812,6 +857,7 @@ OpenAI,ashby,openai
 Opencall,ashby,opencall
 OpenWork,greenhouse,openwork
 Ophelia,greenhouse,ophelia
+Optro,ashby,optro
 Ora AI,greenhouse,ora
 Orbital Operations,greenhouse,orbitaloperations
 Orca,ashby,orca
@@ -856,6 +902,7 @@ Permutive,ashby,permutive
 Perpay,greenhouse,perpay
 Perplexity,ashby,perplexity
 Persona,ashby,persona
+Pfizer,workday,pfizer|wd1|PfizerCareers
 Pharos,ashby,pharos
 Phase Biolabs,ashby,phasebiolabs
 Philips,workday,philips|wd3|jobs-and-careers
@@ -882,6 +929,7 @@ Point72,greenhouse,point72
 PointOne,ashby,pointone
 Poka Labs,greenhouse,poka
 Polar,ashby,polar
+Polarsteps,ashby,polarsteps
 Polymath,ashby,polymath
 Popl,ashby,popl
 Porter,greenhouse,porter
@@ -909,6 +957,7 @@ Prosus,ashby,prosus
 Proto,greenhouse,proto
 Provision,ashby,provision
 Prudentia Sciences,ashby,prudentia-sciences
+Psiquantum,greenhouse,psiquantum
 Publicis Sapient,smartrecruiters,PublicisSapient
 Pulse,ashby,pulse
 Pulse,greenhouse,pulse
@@ -920,7 +969,9 @@ Pyka,lever,pyka
 Pylon,ashby,pylon
 Pylon-labs,ashby,pylon-labs
 Pyrotek3,smartrecruiters,Pyrotek3
+Qonto,ashby,qonto
 qualtrics,greenhouse,qualtrics
+Quantexa,ashby,quantexa
 Quantiq,greenhouse,quantiq
 Quantumdiamonds,ashby,quantumdiamonds
 Quartzy,lever,quartzy
@@ -950,6 +1001,7 @@ Recidiviz,greenhouse,recidiviz
 Reddit,greenhouse,reddit
 Reducto,ashby,reducto
 Redwingshoecompany,smartrecruiters,RedWingShoeCompany
+Reedsy,ashby,reedsy
 refine,ashby,refine
 Reflex,greenhouse,reflex
 Reform,ashby,reform
@@ -963,6 +1015,8 @@ Remote,greenhouse,remote
 Render,ashby,render
 Rendezvousrobotics,greenhouse,rendezvousrobotics
 Renesaselectronics,smartrecruiters,RenesasElectronics
+Rentman,ashby,rentman
+Reonic,ashby,reonic
 Replit,ashby,replit
 Replo,ashby,replo
 Rescale,ashby,rescale
@@ -981,11 +1035,13 @@ Riverbank,smartrecruiters,Riverbank
 Rivet,ashby,rivet
 Rivia.AI,ashby,rivia
 Rivianvw,ashby,rivianvw
+Robin Radar,ashby,robin-radar
 Robinhood,greenhouse,robinhood
 Roblox,greenhouse,roblox
 Roboflow,ashby,roboflow
 Roche,workday,roche|wd3|roche-ext
 rocketlab,greenhouse,rocketlab
+Rohlik,ashby,rohlik
 Rollout,ashby,rollout
 Rollstack,ashby,rollstack
 Roofr,greenhouse,roofr
@@ -998,6 +1054,7 @@ Runway,ashby,runway
 Ryvn,ashby,ryvn
 Rzr,greenhouse,rzr
 S&P Global,smartrecruiters,SPGlobal
+S&P Global,workday,spgi|wd5|SPGI_Careers
 SafetyKit,ashby,safetykit
 Sage Care,ashby,sagecare
 Salesforce,workday,salesforce|wd12|External_Career_Site
@@ -1059,6 +1116,7 @@ Singlestore,greenhouse,singlestore
 Sirenopt,greenhouse,sirenopt
 SIRUM,greenhouse,sirum
 Siteminder,smartrecruiters,Siteminder
+Siteminder,ashby,siteminder
 Skill-lync,smartrecruiters,Skill-lync
 Skyband,ashby,skyband
 Skydio,ashby,skydio
@@ -1106,7 +1164,9 @@ Stackav,greenhouse,stackav
 Stacker,ashby,stacker
 Starburst,greenhouse,starburst
 STARK BANK,lever,starkbank
+State Street,workday,statestreet|wd1|Global
 Statiq.,smartrecruiters,Statiq
+Statista,ashby,statista
 Stepful,ashby,stepful
 Stilta,ashby,stilta
 Stradaeducation,lever,stradaeducation
@@ -1118,6 +1178,7 @@ Submittable,greenhouse,submittable
 Substack,ashby,substack
 Substrate,ashby,substrate
 sumup,greenhouse,sumup
+Sunday Natural,ashby,sunday-natural
 Sunset,greenhouse,sunset
 Sunset,ashby,sunset
 Supabase,ashby,supabase
@@ -1172,6 +1233,7 @@ Thenewyorktimes,greenhouse,thenewyorktimes
 Theo,ashby,theo
 Thera,ashby,thera
 Thndr,ashby,thndr
+Thomson Reuters,workday,thomsonreuters|wd5|External_Career_Site
 Thoughtworksreferral,greenhouse,thoughtworksreferral
 Thunder Compute,ashby,thundercompute
 Thunkable,lever,thunkable
@@ -1185,6 +1247,7 @@ Tolmo,ashby,tolmo
 Topline Pro,ashby,topline-pro
 Touchmark,smartrecruiters,Touchmark
 Tovala,lever,tovala
+Transfergo,greenhouse,transfergo
 Transmarketgroup,greenhouse,transmarketgroup
 Treasury Prime,greenhouse,treasuryprime
 Trellis AI,lever,trellis
@@ -1225,14 +1288,17 @@ Uplane,ashby,uplane
 Upscale-ai,lever,upscale-ai
 Upstart,lever,upstart
 Upstox,smartrecruiters,Upstox
+Upvest,ashby,upvest
 Urban Company,lever,urbancompany
 UserGems,greenhouse,usergems
 Usul,ashby,usul
 Valon,ashby,Valon
+Vanguard,workday,vanguard|wd5|vanguard_external
 Vanta,ashby,vanta
 Vapi,ashby,vapi
 Vardaspace,greenhouse,vardaspace
 Variance,ashby,variance
+Vast,greenhouse,vast
 Vector,ashby,vector
 veeamsoftware,greenhouse,veeamsoftware
 Veeva Systems,lever,veeva
@@ -1257,6 +1323,7 @@ Vinteden,greenhouse,vinteden
 Visa,smartrecruiters,Visa
 Vital-lyfe,ashby,vital-lyfe
 Vitalize,ashby,vitalize
+Vitesse,ashby,vitesse
 VMware / Broadcom,workday,broadcom|wd1|External_Career
 Vogel,ashby,vogel
 voize,ashby,voize
@@ -1311,6 +1378,8 @@ Yassir,smartrecruiters,Yassir
 Yotta,ashby,yotta
 Yuma AI,greenhouse,yuma
 Zapier,ashby,zapier
+Zeal Network,ashby,zeal-network
+Zego,ashby,zego
 Zen31,smartrecruiters,Zen31
 Zendesk,greenhouse,zendesk
 Zenoti,greenhouse,zenoti
@@ -1322,6 +1391,7 @@ Ziina,ashby,ziina
 Zip,ashby,zip
 Zippi,lever,zippi
 Ziprecruiter,greenhouse,ziprecruiter
+Zoom,workday,zoom|wd5|Zoom
 ZoomInfo,greenhouse,zoominfo
 Zoox,lever,zoox
 Zscaler,greenhouse,zscaler
